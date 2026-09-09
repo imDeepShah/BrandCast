@@ -8,16 +8,16 @@ export async function generateContentWithFallback(prompt, isJson = true) {
   try {
     // Attempt 1: Try the latest, fastest model
     return await ai.models.generateContent({
-      model: 'gemini-3.6-flash',
+      model: 'gemini-2.0-flash',
       contents: prompt,
       config
     });
   } catch (error) {
-    console.warn(`Primary model gemini-3.6-flash failed. Falling back to gemini-3.5-flash-lite...`);
+    console.warn(`Primary model gemini-2.0-flash failed. Falling back to gemini-1.5-flash-8b...`);
     
-    // Attempt 2: Fallback to the highly stable, battle-tested 3.5 flash lite model
+    // Attempt 2: Fallback to the highly stable, ultra-fast 8b model
     return await ai.models.generateContent({
-      model: 'gemini-3.5-flash-lite',
+      model: 'gemini-1.5-flash-8b',
       contents: prompt,
       config
     });
