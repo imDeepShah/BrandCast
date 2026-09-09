@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import { generateContentWithFallback } from '@/lib/gemini';
 import { createClient } from '@clickhouse/client';
 
+export const maxDuration = 60; // Allow Vercel functions to run for up to 60 seconds
+
 const clickhouse = createClient({
   url: process.env.CLICKHOUSE_HOST,
   username: process.env.CLICKHOUSE_USER || 'default',
@@ -77,6 +79,6 @@ export async function POST(req) {
 
   } catch (error) {
     console.error("Negotiation error:", error);
-    return NextResponse.json({ success: false, error: "Negotiation failed" }, { status: 500 });
+    return NextResponse.json({ success: false, error: `Server Error: ${error.message || error.toString()}` }, { status: 500 });
   }
 }

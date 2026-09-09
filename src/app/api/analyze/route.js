@@ -3,6 +3,8 @@ import { generateContentWithFallback } from '@/lib/gemini';
 import { createClient } from '@clickhouse/client';
 import { mockBrands } from '@/lib/mockData';
 
+export const maxDuration = 60;
+
 const clickhouse = createClient({
   url: process.env.CLICKHOUSE_HOST,
   username: process.env.CLICKHOUSE_USER || 'default',
