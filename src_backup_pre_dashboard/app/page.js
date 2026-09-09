@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import PitchCard from "@/components/PitchCard";
 import Scene3D from "@/components/Scene3D";
 import { mockScripts } from "@/lib/mockData";
@@ -80,10 +79,12 @@ export default function Home() {
     <main className="main-wrapper awwwards-style">
       {/* Navigation */}
       <nav className="sq-nav animate-in">
-        <div className="sq-logo">BRANDCAST</div>
+        <div className="sq-logo">BrandCast</div>
         <div className="sq-nav-links">
-          <Link href="/" style={{ color: '#00F0FF' }}>STUDIO</Link>
-          <Link href="/analytics">TELEMETRY</Link>
+          <a href="#crew">How it Works</a>
+          <span onClick={scrollToDemo} style={{cursor:'pointer'}}>Platform</span>
+          <a href="#dashboard">Analytics</a>
+          <a href="#pricing">Pricing</a>
         </div>
       </nav>
 

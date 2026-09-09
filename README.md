@@ -1,36 +1,58 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# BrandCast: The Agentic Deal Room for Modern Cinema
 
-## Getting Started
+**🎬 Built for the Google Gemini Agentic Hackathon**
 
-First, run the development server:
+## The Problem
+Product placement in cinema is a broken, localized, and painfully slow industry. Producers spend months pitching brands manually, while brands struggle to find organic integrations that don't feel forced. 
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## The Solution
+**BrandCast** is a complete enterprise platform that uses autonomous AI agents to parse screenplays, identify organic product placement opportunities, and negotiate binding legal contracts in real-time. 
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+By leveraging the **Gemini Enterprise Agent Platform** and a high-performance **ClickHouse Vector Database**, BrandCast completely automates the Hollywood deal-making pipeline.
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🚀 How It Works (The Agentic Workflow)
 
-## Learn More
+1. **The Supervisor Agent (Gemini 1.5 Pro):** Reads your screenplay snippet and isolates physical objects and narrative themes.
+2. **The Matchmaker Agent (Vector RAG):** Queries the ClickHouse Vector Database using Gemini Embeddings to find global brands whose target demographics and creative constraints perfectly match the scene.
+3. **The Agentic Deal Room:** 
+   - A Producer Agent drafts a custom integration pitch.
+   - The Brand Manager Agent acts autonomously to accept, reject, or counter the offer based on strict internal budgets and brand guidelines.
+4. **Automated Legal Generation:** Once a deal is struck, the AI instantly generates a structured, binding 4-part legal contract.
 
-To learn more about Next.js, take a look at the following resources:
+## 🛠 Tech Stack & Partner Integrations
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+*   **Google Gemini (Flash/Pro/Embeddings):** Powers all autonomous agents, decision engines, and contract drafting capabilities. Also used to generate dense 3072-dimensional vector embeddings for semantic matching.
+*   **ClickHouse (Partner Track):** Serves as our lightning-fast Vector Database AND our high-performance OLAP engine. 
+    * **Vector RAG:** We store dense embeddings of brand profiles and perform instantaneous `cosineDistance` searches to match scripts with brands.
+    * **Real-time OLAP:** We seeded a `historical_deals` table with 50,000 rows to demonstrate ClickHouse's sub-millisecond aggregation speeds (`sum`, `avg`, `count`) on our Telemetry Dashboard.
+*   **Next.js & React:** Powers the highly-polished, cinematic frontend interface, Agentic Deal Room UI, and the dynamic Brand Synergy Radar.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 💼 Business Viability (The Conceptual Market)
+We designed BrandCast not just as a technical demo, but as a viable SaaS startup. The platform features a conceptual Go-To-Market strategy with a 3-tier pricing model:
+*   **Indie Creator:** 10% escrow fee per closed deal.
+*   **Studio Pro:** $4,999/mo for unlimited agentic outreach.
+*   **Enterprise Hub:** Custom on-premise model hosting for massive production houses.
 
-## Deploy on Vercel
+*(Note: The monetization and dashboard sections are conceptual models designed to demonstrate the platform's real-world scalability and market fit).*
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## ⚙️ Running Locally
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. Clone the repository and `npm install`
+2. Create a `.env.local` file with the following:
+   ```env
+   GEMINI_API_KEY=your_key
+   CLICKHOUSE_HOST=your_host
+   CLICKHOUSE_USER=default
+   CLICKHOUSE_PASSWORD=your_password
+   ```
+3. Run the automated database setup to seed the ClickHouse Vector DB and OLAP tables:
+   ```bash
+   node scripts/setupClickhouse.js
+   node scripts/seed_historical_deals.js
+   ```
+4. Start the server:
+   ```bash
+   npm run dev
+   ```
