@@ -41,10 +41,8 @@ export async function POST(req) {
     
     Return ONLY a valid JSON object with the following keys:
     "status": must be "ACCEPT", "COUNTER", or "REJECT".
-    "message": A highly realistic, in-character 2-sentence response explaining your decision regarding both the price and their specific creative terms. IMPORTANT: If your status is COUNTER, you MUST wrap any specific modified integration terms or key differences you are demanding in exactly this HTML: <span class='contract-highlight'>DIFFERENCE HERE</span>. (Note the single quotes for the class to prevent JSON string breaking).
-    "counterOffer": The numerical dollar amount of your counter offer, or null if accepted/rejected.
-    "contractDraft": If status is ACCEPT, generate a brief, 2-paragraph professional legal agreement summary (strictly under 100 words to ensure ultra-fast response times). It must still cover Scope, Payment, and Rights.
-    IMPORTANT: You MUST wrap the specific negotiated dollar amount, the brand name, and the core creative integration terms in the following HTML span exactly like this: <span class='contract-highlight'>VALUE HERE</span>. Do this so the user can easily see the populated data. If status is NOT ACCEPT, leave this as null.`;
+    "message": A highly realistic, in-character 2-sentence response explaining your decision regarding both the price and their specific creative terms. IMPORTANT: If your status is COUNTER, you MUST wrap any specific modified integration terms or key differences you are demanding in exactly this HTML: <span class='contract-highlight'>DIFFERENCE HERE</span>.
+    "counterOffer": The numerical dollar amount of your counter offer, or null if accepted/rejected.`;
 
     const response = await generateContentWithFallback(prompt);
     let decision = JSON.parse(response.text);
@@ -54,22 +52,6 @@ export async function POST(req) {
       decision.status = "ACCEPT";
       delete decision.counterOffer;
       decision.message = `We have a deal. $${askAmount} is acceptable based on our previous negotiation.`;
-      
-      if (!decision.contractDraft) {
-        // Generate the contract since the LLM didn't (because it thought it was still countering)
-        const contractPrompt = `Draft a brief, 2-paragraph product placement agreement summary between "${brand.brand_name}" and the Producer for $${askAmount}. 
-        The agreed integration terms are: "${proposalText}".
-        Keep it strictly under 100 words to ensure ultra-fast generation.
-        IMPORTANT: Wrap the dollar amount, the brand name, and the core creative integration terms in exactly this HTML: <span class='contract-highlight'>VALUE</span>. (Use single quotes for the class).
-        Return ONLY the raw contract text, no markdown code block fences.`;
-        
-        try {
-           const cRes = await generateContentWithFallback(contractPrompt, false);
-           decision.contractDraft = cRes.text.replace(/```(json|markdown|text)?/g, '').trim();
-        } catch(e) {
-           decision.contractDraft = `FORMAL AGREEMENT: ${brand.brand_name} agrees to pay the Producer $${askAmount} for the product placement as proposed. This is a binding agreement.`;
-        }
-      }
     }
 
     return NextResponse.json({

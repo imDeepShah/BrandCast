@@ -11,6 +11,8 @@ export default function PitchCard({ brand }) {
   
   const [isNegotiating, setIsNegotiating] = useState(false);
   const [negotiationResult, setNegotiationResult] = useState(null);
+  const [contractStream, setContractStream] = useState("");
+  const [isStreaming, setIsStreaming] = useState(false);
   
   const [submitCount, setSubmitCount] = useState(0);
   const [lastCounterOffer, setLastCounterOffer] = useState(null);
@@ -45,6 +47,43 @@ export default function PitchCard({ brand }) {
     }
   };
 
+  const startContractStreaming = async () => {
+    setIsStreaming(true);
+    setContractStream("");
+    
+    try {
+      const response = await fetch('/api/draftContract', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          brandName: brand.brand_name,
+          askAmount: Number(producerAsk),
+          proposalText
+        })
+      });
+
+      if (!response.body) throw new Error("No readable stream");
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let done = false;
+
+      while (!done) {
+        const { value, done: readerDone } = await reader.read();
+        done = readerDone;
+        if (value) {
+          const chunk = decoder.decode(value, { stream: true });
+          setContractStream(prev => prev + chunk);
+        }
+      }
+    } catch (error) {
+      console.error("Stream failed", error);
+      setContractStream("Error generating Term Sheet. Please retry.");
+    } finally {
+      setIsStreaming(false);
+    }
+  };
+
   const handleNegotiate = async () => {
     if (Number(producerAsk) > brand.max_budget) {
       setValidationError(`Ask exceeds Remaining Budget of $${brand.max_budget.toLocaleString()}`);
@@ -76,6 +115,7 @@ export default function PitchCard({ brand }) {
         
         if (data.data.status === 'ACCEPT') {
            setStep(3);
+           startContractStreaming();
         } else {
            setStep(2);
         }
@@ -297,10 +337,12 @@ export default function PitchCard({ brand }) {
           <div 
             data-lenis-prevent="true" 
             style={{ background: '#000', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '4px', padding: '1.5rem', marginBottom: '2rem', maxHeight: '300px', overflowY: 'auto' }}>
-            <h5 style={{ fontSize: '0.8rem', textTransform: 'uppercase', color: 'var(--text-secondary)', marginBottom: '1.5rem', letterSpacing: '0.1em', textAlign: 'center' }}>Binding Product Placement Agreement</h5>
+            <h5 style={{ fontSize: '0.8rem', textTransform: 'uppercase', color: 'var(--text-secondary)', marginBottom: '1.5rem', letterSpacing: '0.1em', textAlign: 'center' }}>
+              Term Sheet / Memorandum of Understanding
+            </h5>
             <div 
               style={{ fontSize: '0.85rem', fontFamily: 'monospace', color: 'var(--text-primary)', lineHeight: '1.8', whiteSpace: 'pre-wrap' }}
-              dangerouslySetInnerHTML={{ __html: negotiationResult.contractDraft }}
+              dangerouslySetInnerHTML={{ __html: contractStream + (isStreaming ? "<span class='cursor-blink'>█</span>" : "") }}
             />
           </div>
 

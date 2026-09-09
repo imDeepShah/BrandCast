@@ -12,3 +12,11 @@ export async function generateContentWithFallback(prompt, isJson = true) {
     config
   });
 }
+
+export async function generateContentStreamWithFallback(prompt) {
+  // Use a capable model for drafting the Term Sheet stream
+  return await ai.models.generateContentStream({
+    model: 'gemini-3.5-flash-lite',
+    contents: prompt
+  });
+}
