@@ -43,7 +43,7 @@ export async function POST(req) {
     "status": must be "ACCEPT", "COUNTER", or "REJECT".
     "message": A highly realistic, in-character 2-sentence response explaining your decision regarding both the price and their specific creative terms. IMPORTANT: If your status is COUNTER, you MUST wrap any specific modified integration terms or key differences you are demanding in exactly this HTML: <span class='contract-highlight'>DIFFERENCE HERE</span>. (Note the single quotes for the class to prevent JSON string breaking).
     "counterOffer": The numerical dollar amount of your counter offer, or null if accepted/rejected.
-    "contractDraft": If status is ACCEPT, generate a highly realistic, professional 4-section legal agreement. Structure it strictly with formatting matching real industry contracts. Sections must include: 1. SCOPE OF WORK, 2. PAYMENT TERMS, 3. INTELLECTUAL PROPERTY & USAGE RIGHTS, 4. INDEMNIFICATION. 
+    "contractDraft": If status is ACCEPT, generate a brief, 2-paragraph professional legal agreement summary (strictly under 100 words to ensure ultra-fast response times). It must still cover Scope, Payment, and Rights.
     IMPORTANT: You MUST wrap the specific negotiated dollar amount, the brand name, and the core creative integration terms in the following HTML span exactly like this: <span class='contract-highlight'>VALUE HERE</span>. Do this so the user can easily see the populated data. If status is NOT ACCEPT, leave this as null.`;
 
     const response = await generateContentWithFallback(prompt);
@@ -57,9 +57,9 @@ export async function POST(req) {
       
       if (!decision.contractDraft) {
         // Generate the contract since the LLM didn't (because it thought it was still countering)
-        const contractPrompt = `Draft a highly realistic, professional 4-section product placement agreement between "${brand.brand_name}" and the Producer for $${askAmount}. 
+        const contractPrompt = `Draft a brief, 2-paragraph product placement agreement summary between "${brand.brand_name}" and the Producer for $${askAmount}. 
         The agreed integration terms are: "${proposalText}".
-        Structure it strictly with formatting. Sections must include: 1. SCOPE OF WORK, 2. PAYMENT TERMS, 3. INTELLECTUAL PROPERTY & USAGE RIGHTS, 4. INDEMNIFICATION.
+        Keep it strictly under 100 words to ensure ultra-fast generation.
         IMPORTANT: Wrap the dollar amount, the brand name, and the core creative integration terms in exactly this HTML: <span class='contract-highlight'>VALUE</span>. (Use single quotes for the class).
         Return ONLY the raw contract text, no markdown code block fences.`;
         
