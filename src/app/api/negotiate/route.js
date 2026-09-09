@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { generateContentWithFallback } from '@/lib/gemini';
 import { createClient } from '@clickhouse/client';
+import { mockBrands } from '@/lib/mockData';
 
 export const maxDuration = 60; // Allow Vercel functions to run for up to 60 seconds
 
@@ -15,15 +16,23 @@ export async function POST(req) {
     const { brandId, producerAsk, proposalText, lastCounterOffer } = await req.json();
     const askAmount = parseInt(producerAsk, 10);
 
-    // Fetch the specific brand from ClickHouse
-    const query = `SELECT * FROM brands WHERE id = '${brandId}' LIMIT 1`;
-    const resultSet = await clickhouse.query({ query, format: 'JSONEachRow' });
-    const brands = await resultSet.json();
-    
-    if (brands.length === 0) {
-      return NextResponse.json({ success: false, error: "Brand not found in database" }, { status: 404 });
+    // Fetch the specific brand from ClickHouse with an instant mock fallback
+    let brand;
+    try {
+      const query = `SELECT * FROM brands WHERE id = '${brandId}' LIMIT 1`;
+      const resultSet = await clickhouse.query({ query, format: 'JSONEachRow' });
+      const brands = await resultSet.json();
+      
+      if (brands.length === 0) throw new Error("Empty result from ClickHouse");
+      brand = brands[0];
+    } catch (dbError) {
+      console.warn("ClickHouse lookup failed, falling back to mock data:", dbError.message);
+      brand = mockBrands.find(b => b.id === brandId);
+      
+      if (!brand) {
+        return NextResponse.json({ success: false, error: "Brand not found in database or mock data" }, { status: 404 });
+      }
     }
-    const brand = brands[0];
 
     const prompt = `You are the AI Brand Manager for "${brand.brand_name}" (${brand.category}). 
     Your ideal placement budget is $${brand.min_placement_budget}, and your absolute maximum ceiling is $${brand.max_budget}. 
